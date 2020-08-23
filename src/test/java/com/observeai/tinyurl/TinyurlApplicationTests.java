@@ -33,23 +33,28 @@ class TinyurlApplicationTests {
 
 	@Test
 	void testGetUrl() throws IOException {
-		//TinyUrlModel.clearMap();
 		String url = "www.google.com";
 		ResponseEntity<Object> responseEntity = this.tinyUrlResource.create("www.google.com");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		this.tinyUrlResource.getUrl(response, responseEntity.getBody().toString());
 		assertEquals(response.getHeader("Location"), url);
+
+		MockHttpServletResponse response1 = new MockHttpServletResponse();
+		this.tinyUrlResource.getUrl(response1, "test");
+		assertEquals(response1.getStatus(), HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Test
 	void testGetHitCount() throws IOException {
-		//TinyUrlModel.clearMap();
 		ResponseEntity<Object> responseEntity = this.tinyUrlResource.create("www.google.com");
 		HttpServletResponse httpServletResponse = Mockito.mock(HttpServletResponse.class);
 		this.tinyUrlResource.getUrl(httpServletResponse, responseEntity.getBody().toString());
 		this.tinyUrlResource.getUrl(httpServletResponse, responseEntity.getBody().toString());
 		String hitCount = this.tinyUrlResource.getHitCount(responseEntity.getBody().toString());
 		assertEquals(hitCount, "Tiny url oy3ubD0C accessed 2 times");
+
+		hitCount = this.tinyUrlResource.getHitCount("test");
+		assertEquals(hitCount, "Tiny url test not present in database");
 	}
 
 }
